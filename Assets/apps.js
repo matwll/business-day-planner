@@ -13,23 +13,25 @@ var currentHour = today.format('hA');
 currentDate.textContent = today.format('ddd, MMMM Do');
 
 //event listener to save inputted event
-plannerEl.on('click', saveEvent);
+saveBtn.on('click', saveEvent);
 
 //loop through the time slots to determine if they are past/present/future and asign a class for formating based on that
-for(var i = 0; i < plannerEl.length; i++){
+function init(){
+    for(var i = 0; i < plannerEl.length; i++){
 
-    var hours = plannerEl[i].children[0].innerText;
-    console.log(currentHour);
-    console.log(hours);
-    
-    if (currentHour > hours){
-        plannerEl[i].children[1].classList.add('past');
-    }else if (currentHour < hours){
-        plannerEl[i].children[1].classList.add('future');
-    }else {
-        plannerEl[i].children[1].classList.add('present');
+        var hours = plannerEl[i].children[0].innerText;
+        console.log(currentHour);
+        console.log(hours);
+        
+        if (currentHour > hours){
+            plannerEl[i].children[1].classList.add('past');
+        }else if (currentHour < hours){
+            plannerEl[i].children[1].classList.add('future');
+        }else {
+            plannerEl[i].children[1].classList.add('present');
+        }
     }
-}
+};
 
 //event to select the text area element and disable editing.
 function saveEvent(e){
@@ -40,8 +42,17 @@ function saveEvent(e){
     if(e.target == clickTarget){
         if (clickTarget.prop('disable', false)){
         clickTarget.prop('disable', true);
+
         }else{
             clickTarget.prop('disable', false);
         }
     }
+
+    //store the saved event into local storage, and get the event if page is refreshed.
+    var itemEl = localStorage.getItem('Planned Event', plannedEvent);
+    plannedEvent.innerText = itemEl;
+
+    localStorage.setItem('Planned Event', JSON.stringify(plannedEvent))
 }
+
+init();
