@@ -31,6 +31,7 @@ function init(){
             plannerEl[i].children[1].classList.add('present');
         }
     }
+    localStorage.setItem('Planned Event', plannedEvent)
 };
 
 //event to select the text area element and disable editing.
@@ -49,10 +50,8 @@ function saveEvent(e){
     }
 
     //store the saved event into local storage, and get the event if page is refreshed.
-    var itemEl = localStorage.getItem('Planned Event', plannedEvent);
+    var itemEl = localStorage.getItem(JSON.stringify(plannedEvent));
     plannedEvent.innerText = itemEl;
-
-    localStorage.setItem('Planned Event', JSON.stringify(plannedEvent))
 }
 
 init();
