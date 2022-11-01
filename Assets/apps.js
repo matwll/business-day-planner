@@ -1,57 +1,64 @@
 //hooks into the DOM
-var currentDate = document.getElementById('currentDay');
-var plannerEl = $(document.querySelectorAll('.row'));
-var plannedEvent = $(document.getElementById('planned-event'));
-var saveBtn = $(document.querySelectorAll('.saveBtn'));
+var currentDate = document.getElementById("currentDay");
+var plannerEl = $(document.querySelectorAll(".row"));
+var plannedEvent = $(document.getElementById("planned-event"));
+var saveBtn = $(".saveBtn");
+
+var storageInfo = [];
 
 //variable to store current time/date information
-var today = moment()
+var today = moment();
 //variable to store the current hour
-var currentHour = today.format('hA');
+var currentHour = today.format("hA");
 
 //display todays date in the header
-currentDate.textContent = today.format('ddd, MMMM Do');
+currentDate.textContent = today.format("ddd, MMMM Do");
 
 //event listener to save inputted event
-saveBtn.on('click', saveEvent);
+saveBtn.on("click", saveEvent);
 
 //loop through the time slots to determine if they are past/present/future and asign a class for formating based on that
-function init(){
-    for(var i = 0; i < plannerEl.length; i++){
+function init() {
+  for (var i = 0; i < plannerEl.length; i++) {
+    var hours = plannerEl[i].children[0].innerText;
 
-        var hours = plannerEl[i].children[0].innerText;
-        console.log(currentHour);
-        console.log(hours);
-        
-        if (currentHour > hours){
-            plannerEl[i].children[1].classList.add('past');
-        }else if (currentHour < hours){
-            plannerEl[i].children[1].classList.add('future');
-        }else {
-            plannerEl[i].children[1].classList.add('present');
-        }
+    if (currentHour > hours) {
+      plannerEl[i].children[1].classList.add("past");
+    } else if (currentHour < hours) {
+      plannerEl[i].children[1].classList.add("future");
+    } else {
+      plannerEl[i].children[1].classList.add("present");
     }
-    localStorage.setItem('Planned Event', plannedEvent)
-};
+  }
 
-//event to select the text area element and disable editing.
-function saveEvent(e){
-    e.preventDefault;
-    var clickTarget = $(e.target).siblings();
-    console.log(clickTarget);
-
-    if(e.target == clickTarget){
-        if (clickTarget.prop('disable', false)){
-        clickTarget.prop('disable', true);
-
-        }else{
-            clickTarget.prop('disable', false);
-        }
+    //get the event from local storage and display in the correct time slot.
+    var itemEl = JSON.parse(localStorage.getItem('Planned Event'))||[];
+    for( var i = 0; i < itemEl.length; i++){
+        $(`#planned-event-${itemEl[i].time}`).val(itemEl[i].text);
     }
+}
+//save event information to local storage
+function saveEvent(e) {
+  e.preventDefault;
+  var clickTarget = $(this).siblings(".planned-event");
+  var textValue = $(this).siblings(".planned-event").val();
+  var timeValue = $(this).siblings(".planned-event").attr('data-id');
 
-    //store the saved event into local storage, and get the event if page is refreshed.
-    var itemEl = localStorage.getItem(JSON.stringify(plannedEvent));
-    plannedEvent.innerText = itemEl;
+  var storageEL = {
+    text: textValue,
+    time: timeValue,
+  }
+  storageInfo.push(storageEL);
+
+  //disable the text area from editing and enable it on a second click
+  if (clickTarget[0].disabled) {
+    clickTarget[0].disabled = false;
+  } else {
+    clickTarget[0].disabled = true;
+  }
+
+  localStorage.setItem("Planned Event", JSON.stringify(storageInfo));
+
 }
 
 init();
